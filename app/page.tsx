@@ -104,7 +104,18 @@ export default function GreensboroAIChat() {
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
+
+    // Short delay to let scrollIntoView finish, then adjust by navbar height
+    setTimeout(() => {
+      const container = messagesEndRef.current?.parentElement;
+      if (container) {
+        container.scrollTop = container.scrollTop - 80; // adjust 80 to match your navbar height
+      }
+    }, 350);
   };
 
   const scrollToResults = () => {
