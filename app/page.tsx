@@ -103,17 +103,18 @@ export default function GreensboroAIChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
- const scrollToBottom = () => {
-   messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-
-   // Short delay to let scrollIntoView finish, then adjust by navbar height
-   setTimeout(() => {
-     const container = messagesEndRef.current?.parentElement;
-     if (container) {
-       container.scrollTop = container.scrollTop - 80; // adjust 80 to match your navbar height
-     }
-   }, 350);
- };
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
+    setTimeout(() => {
+      const container = messagesEndRef.current?.parentElement;
+      if (container) {
+        container.scrollTop = container.scrollTop - 80;
+      }
+    }, 350);
+  };
 
   const scrollToResults = () => {
     setTimeout(() => {
@@ -376,6 +377,21 @@ export default function GreensboroAIChat() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background relative overflow-hidden">
+      <style>{`
+        .welcome-message {
+          position: sticky;
+          top: 80px;
+          z-index: 20;
+          background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+          backdrop-filter: blur(10px);
+          padding: 1rem;
+          border-bottom: 1px solid #e5e7eb;
+        }
+        .chat-container {
+          margin-top: 160px;
+          height: calc(100vh - 240px);
+        }
+      `}</style>
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="absolute top-1/4 left-10 w-60 h-60 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute top-3/4 right-20 w-80 h-80 bg-emerald-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
@@ -387,17 +403,6 @@ export default function GreensboroAIChat() {
             ))}
           </div>
         </div>
-
-        {/* <FloatingElement className="top-20 left-20 z-0" delay={0} duration={10000}>
-          <div className="p-2 glass-card rounded-xl">
-            <Cpu className="w-4 h-4 text-white/40" />
-          </div>
-        </FloatingElement>
-        <FloatingElement className="top-40 right-32 z-0" delay={5000} duration={8000}>
-          <div className="p-2 glass-card rounded-xl">
-            <Bot className="w-5 h-5 text-white/40" />
-          </div>
-        </FloatingElement> */}
       </div>
 
       <div className="fixed top-0 left-0 right-0 z-50 glass-effect border-b border-border h-20">
@@ -418,174 +423,166 @@ export default function GreensboroAIChat() {
         </div>
       </div>
 
-      <div
-        className="flex flex-col"
-        style={{
-          marginTop: "80px",
-          height: "calc(100vh - 180px)",
-        }}
-      >
-        <div className="flex-1 overflow-y-auto pt-15 px-6 pb-40 relative z-10 border ">
-          <div className="max-w-6xl mx-auto space-y-8 py-6 mt-10 ">
-            {messages.map((message) => (
-              <div key={message.id} className="animate-slide-up">
-                {message.type === "user" ? (
-                  <div className="flex justify-end">
-                    <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-2xl rounded-br-md px-6 py-4 max-w-xl shadow-lg ">
-                      <p className="text-sm font-medium font-[family-name:var(--font-open-sans)] text-white">
-                        {message.content}
-                      </p>
-                    </div>
+      <div className="flex-1 overflow-y-auto pt-15 px-6 pb-40 relative z-10 ">
+        <div className="max-w-6xl mx-auto space-y-8 py-6 mt-10 ">
+          {messages.map((message) => (
+            <div key={message.id} className="animate-slide-up">
+              {message.type === "user" ? (
+                <div className="flex justify-end">
+                  <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-2xl rounded-br-md px-6 py-4 max-w-xl shadow-lg">
+                    <p className="text-sm font-medium font-[family-name:var(--font-open-sans)] text-white">
+                      {message.content}
+                    </p>
                   </div>
-                ) : message.type === "assistant" ? (
-                  <div className="flex gap-4">
-                    <div className="w-10 h-10 flex-shrink-0 ">
-                      <GreensboroLogo size="w-10 h-10" />
-                    </div>
-                    <div className="glass-card rounded-2xl rounded-bl-md px-6 py-4 max-w-xl">
-                      <p className="text-sm text-card-foreground font-medium font-[family-name:var(--font-open-sans)]">
-                        {message.content}
-                      </p>
-                    </div>
+                </div>
+              ) : message.type === "assistant" ? (
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 flex-shrink-0">
+                    <GreensboroLogo size="w-10 h-10" />
                   </div>
-                ) : (
-                  <div className="flex gap-4" ref={resultsRef}>
-                    <div className="w-10 h-10 flex-shrink-0">
-                      <GreensboroLogo size="w-10 h-10" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                        {message.data?.map((item: EventData, index: number) => (
-                          <Card
-                            key={item.id}
-                            className="group overflow-hidden hover-lift glass-card rounded-2xl border-border hover:border-emerald-600/20"
-                            style={{ animationDelay: `${index * 100}ms` }}
-                          >
-                            <div className="relative overflow-hidden rounded-t-2xl h-48">
-                              <img
-                                src={item.listing_image || "/placeholder.svg"}
-                                alt={item.title}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 bg-gray-200"
-                              />
-                              <div className="absolute bottom-0 left-2 mb-2 mr-2">
-                                <Badge className=" bg-emerald-500/90 text-emerald-foreground hover:bg-emerald-600 font-medium px-3 py-1 rounded-tl-full rounded-bl-full text-white">
-                                  {item.categories}
-                                </Badge>
+                  <div className="glass-card rounded-2xl rounded-bl-md px-6 py-4 max-w-xl">
+                    <p className="text-sm text-card-foreground font-medium font-[family-name:var(--font-open-sans)]">
+                      {message.content}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex gap-4" ref={resultsRef}>
+                  <div className="w-10 h-10 flex-shrink-0">
+                    <GreensboroLogo size="w-10 h-10" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                      {message.data?.map((item: EventData, index: number) => (
+                        <Card
+                          key={item.id}
+                          className="group overflow-hidden hover-lift glass-card rounded-2xl border-border hover:border-emerald-600/20"
+                          style={{ animationDelay: `${index * 100}ms` }}
+                        >
+                          <div className="relative overflow-hidden rounded-t-2xl h-48">
+                            <img
+                              src={item.listing_image || "/placeholder.svg"}
+                              alt={item.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 bg-gray-200"
+                            />
+                            <div className="absolute bottom-0 left-2 mb-2 mr-2">
+                              <Badge className="bg-emerald-500/90 text-emerald-foreground hover:bg-emerald-600 font-medium px-3 py-1 rounded-full text-white">
+                                {item.categories}
+                              </Badge>
+                            </div>
+                          </div>
+                          <CardContent className="p-5">
+                            <h3 className="font-semibold text-card-foreground mb-4 text-base line-clamp-2 group-hover:text-emerald-600 transition-colors font-[family-name:var(--font-montserrat)]">
+                              {item.title}
+                            </h3>
+
+                            <div className="space-y-3 mb-4">
+                              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                <div className="w-8 h-8 bg-emerald-500/10 rounded-full flex items-center justify-center">
+                                  <MapPin className="w-4 h-4 text-emerald-600" />
+                                </div>
+                                <span className="truncate font-medium font-[family-name:var(--font-open-sans)]">
+                                  {item.address}, {item.city}
+                                </span>
+                              </div>
+
+                              {item.event_starts && (
+                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                  <div className="w-8 h-8 bg-emerald-500/10 rounded-full flex items-center justify-center">
+                                    <Calendar className="w-4 h-4 text-emerald-600" />
+                                  </div>
+                                  <span className="font-medium font-[family-name:var(--font-open-sans)]">
+                                    {formatDate(item.event_starts)}
+                                    {item.event_ends &&
+                                      item.event_ends !== item.event_starts &&
+                                      ` - ${formatDate(item.event_ends)}`}
+                                  </span>
+                                </div>
+                              )}
+
+                              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                <div className="w-8 h-8 bg-emerald-500/10 rounded-full flex items-center justify-center">
+                                  <DollarSign className="w-4 h-4 text-emerald-600" />
+                                </div>
+                                <span className="font-semibold text-emerald-600 text-sm font-[family-name:var(--font-open-sans)]">
+                                  {item.price === "0" || item.price === "free"
+                                    ? "Free"
+                                    : item.price}
+                                </span>
                               </div>
                             </div>
-                            <CardContent className="p-5">
-                              <h3 className="font-semibold text-card-foreground mb-4 text-base line-clamp-2 group-hover:text-emerald-600 transition-colors font-[family-name:var(--font-montserrat)]">
-                                {item.title}
-                              </h3>
 
-                              <div className="space-y-3 mb-4">
-                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                  <div className="w-8 h-8 bg-emerald-500/10 rounded-full flex items-center justify-center">
-                                    <MapPin className="w-4 h-4 text-emerald-600" />
-                                  </div>
-                                  <span className="truncate font-medium font-[family-name:var(--font-open-sans)]">
-                                    {item.address}, {item.city}
-                                  </span>
-                                </div>
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              {item.eventItemCategories
+                                ?.slice(0, 2)
+                                .map((cat, idx) => (
+                                  <Badge
+                                    key={idx}
+                                    variant="outline"
+                                    className="border-emerald-400/20 text-emerald-600 bg-emerald-500/5 rounded-full px-4 py-2 text-base"
+                                  >
+                                    {cat.category_name}
+                                  </Badge>
+                                ))}
+                              {item.attractionTypes
+                                ?.slice(0, 2)
+                                .map((type, idx) => (
+                                  <Badge
+                                    key={idx}
+                                    variant="outline"
+                                    className="border-emerald-400/20 text-emerald-600 bg-emerald-500/5 rounded-full px-4 py-2 text-base"
+                                  >
+                                    {type.attraction_type}
+                                  </Badge>
+                                ))}
+                            </div>
 
-                                {item.event_starts && (
-                                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                    <div className="w-8 h-8 bg-emerald-500/10 rounded-full flex items-center justify-center">
-                                      <Calendar className="w-4 h-4 text-emerald-600" />
-                                    </div>
-                                    <span className="font-medium font-[family-name:var(--font-open-sans)]">
-                                      {formatDate(item.event_starts)}
-                                      {item.event_ends &&
-                                        item.event_ends !== item.event_starts &&
-                                        ` - ${formatDate(item.event_ends)}`}
-                                    </span>
-                                  </div>
-                                )}
-
-                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                  <div className="w-8 h-8 bg-emerald-500/10 rounded-full flex items-center justify-center">
-                                    <DollarSign className="w-4 h-4 text-emerald-600" />
-                                  </div>
-                                  <span className="font-semibold text-emerald-600 text-sm font-[family-name:var(--font-open-sans)]">
-                                    {item.price === "0" || item.price === "free"
-                                      ? "Free"
-                                      : item.price}
-                                  </span>
-                                </div>
-                              </div>
-
-                              <div className="flex flex-wrap gap-2 mb-4">
-                                {item.eventItemCategories
-                                  ?.slice(0, 2)
-                                  .map((cat, idx) => (
-                                    <Badge
-                                      key={idx}
-                                      variant="outline"
-                                      className="border-emerald-400/20 text-emerald-600 bg-emerald-500/5 rounded-full px-4 py-2 text-base"
-                                    >
-                                      {cat.category_name}
-                                    </Badge>
-                                  ))}
-                                {item.attractionTypes
-                                  ?.slice(0, 2)
-                                  .map((type, idx) => (
-                                    <Badge
-                                      key={idx}
-                                      variant="outline"
-                                      className="border-emerald-400/20 text-emerald-600 bg-emerald-500/5 rounded-full px-4 py-2 text-base"
-                                    >
-                                      {type.attraction_type}
-                                    </Badge>
-                                  ))}
-                              </div>
-
-                              <Button
-                                onClick={() => setSelectedItem(item)}
-                                className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-emerald-foreground font-medium py-2 rounded-xl transition-all duration-300 hover-lift font-[family-name:var(--font-open-sans)]"
-                              >
-                                <ExternalLink
-                                  className="w-4 h-4 mr-2"
-                                  color="white"
-                                />
-                                <span className="text-white">View Details</span>
-                              </Button>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
+                            <Button
+                              onClick={() => setSelectedItem(item)}
+                              className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-emerald-foreground font-medium py-2 rounded-xl transition-all duration-300 hover-lift font-[family-name:var(--font-open-sans)]"
+                            >
+                              <ExternalLink
+                                className="w-4 h-4 mr-2"
+                                color="white"
+                              />
+                              <span className="text-white">View Details</span>
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      ))}
                     </div>
                   </div>
-                )}
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex gap-4 animate-slide-up">
-                <div className="w-10 h-10 flex-shrink-0">
-                  <GreensboroLogo size="w-10 h-10" />
                 </div>
-                <div className="glass-card rounded-2xl rounded-bl-md px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
-                      <div
-                        className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.1s" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"
-                        style={{ animationDelay: "0.2s" }}
-                      ></div>
-                    </div>
-                    <span className="text-sm text-muted-foreground font-medium font-[family-name:var(--font-open-sans)]">
-                      Searching Greensboro...
-                    </span>
+              )}
+            </div>
+          ))}
+          {isLoading && (
+            <div className="flex gap-4 animate-slide-up">
+              <div className="w-10 h-10 flex-shrink-0">
+                <GreensboroLogo size="w-10 h-10" />
+              </div>
+              <div className="glass-card rounded-2xl rounded-bl-md px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
+                    <div
+                      className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"
+                      style={{ animationDelay: "0.1s" }}
+                    ></div>
+                    <div
+                      className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"
+                      style={{ animationDelay: "0.2s" }}
+                    ></div>
                   </div>
+                  <span className="text-sm text-muted-foreground font-medium font-[family-name:var(--font-open-sans)]">
+                    Searching Greensboro...
+                  </span>
                 </div>
               </div>
-            )}
-          </div>
-          <div ref={messagesEndRef} />
+            </div>
+          )}
         </div>
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="fixed bottom-20 left-0 right-0 z-40">
