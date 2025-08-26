@@ -413,7 +413,7 @@ export default function GreensboroAIChat() {
       <div
         className="flex flex-col"
         style={{
-          marginTop: "180px",
+          marginTop: "40px",
           height: "calc(100vh - 180px)",
         }}
       >
