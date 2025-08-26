@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useRef, useEffect } from "react"
+import type React from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Send,
   Sparkles,
@@ -16,43 +16,48 @@ import {
   ArrowRight,
   Bot,
   Cpu,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface ChatMessage {
-  id: string
-  type: "user" | "assistant" | "results"
-  content: string
-  timestamp: Date
-  data?: any[]
+  id: string;
+  type: "user" | "assistant" | "results";
+  content: string;
+  timestamp: Date;
+  data?: any[];
 }
 
 interface ApiResponse {
-  api_url: string
-  intent: string
+  api_url: string;
+  intent: string;
 }
 
 interface EventData {
-  id: string
-  title: string
-  listing_image: string
-  location: string
-  event_starts?: string
-  event_ends?: string
-  address: string
-  city: string
-  price: string
-  is_favourite: boolean
-  eventItemCategories?: Array<{ category_name: string }>
-  attractionTypes?: Array<{ attraction_type: string }>
-  categories: string
-  description?: string
-  phone?: string
-  website?: string
+  id: string;
+  title: string;
+  listing_image: string;
+  location: string;
+  event_starts?: string;
+  event_ends?: string;
+  address: string;
+  city: string;
+  price: string;
+  is_favourite: boolean;
+  eventItemCategories?: Array<{ category_name: string }>;
+  attractionTypes?: Array<{ attraction_type: string }>;
+  categories: string;
+  description?: string;
+  phone?: string;
+  website?: string;
 }
 
 const GreensboroLogo = ({ size = "w-12 h-12" }: { size?: string }) => (
@@ -65,7 +70,7 @@ const GreensboroLogo = ({ size = "w-12 h-12" }: { size?: string }) => (
       />
     </div>
   </div>
-)
+);
 
 const FloatingElement = ({
   children,
@@ -73,10 +78,10 @@ const FloatingElement = ({
   delay = 0,
   duration = 3000,
 }: {
-  children: React.ReactNode
-  className?: string
-  delay?: number
-  duration?: number
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+  duration?: number;
 }) => (
   <div
     className={`absolute ${className}`}
@@ -87,42 +92,45 @@ const FloatingElement = ({
   >
     {children}
   </div>
-)
+);
 
 export default function GreensboroAIChat() {
-  const [showWelcome, setShowWelcome] = useState(true)
-  const [selectedItem, setSelectedItem] = useState<EventData | null>(null)
-  const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const resultsRef = useRef<HTMLDivElement>(null)
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [selectedItem, setSelectedItem] = useState<EventData | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const scrollToResults = () => {
     setTimeout(() => {
-      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-    }, 100)
-  }
+      resultsRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
+  };
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+    scrollToBottom();
+  }, [messages]);
 
   const handleGetStarted = () => {
-    setShowWelcome(false)
+    setShowWelcome(false);
     const welcomeMessage: ChatMessage = {
       id: "1",
       type: "assistant",
       content:
         "Welcome to your intelligent guide to Greensboro! I'm here to help you discover amazing events, attractions, dining, and experiences throughout the Gate City. What would you like to explore today?",
       timestamp: new Date(),
-    }
-    setMessages([welcomeMessage])
-  }
+    };
+    setMessages([welcomeMessage]);
+  };
 
   const callPromptAPI = async (question: string): Promise<ApiResponse> => {
     const response = await fetch("/api/prompt", {
@@ -133,14 +141,14 @@ export default function GreensboroAIChat() {
       body: JSON.stringify({
         question: question,
       }),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error(`Prompt API failed: ${response.status}`)
+      throw new Error(`Prompt API failed: ${response.status}`);
     }
 
-    return await response.json()
-  }
+    return await response.json();
+  };
 
   const callDataAPI = async (apiUrl: string) => {
     const response = await fetch("/api/data", {
@@ -151,41 +159,43 @@ export default function GreensboroAIChat() {
       body: JSON.stringify({
         apiUrl: apiUrl,
       }),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error(`Data API failed: ${response.status}`)
+      throw new Error(`Data API failed: ${response.status}`);
     }
 
-    return await response.json()
-  }
+    return await response.json();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!input.trim() || isLoading) return
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       type: "user",
       content: input,
       timestamp: new Date(),
-    }
+    };
 
-    setMessages((prev) => [...prev, userMessage])
-    const currentInput = input
-    setInput("")
-    setIsLoading(true)
+    setMessages((prev) => [...prev, userMessage]);
+    const currentInput = input;
+    setInput("");
+    setIsLoading(true);
 
     try {
-      const apiResponse = await callPromptAPI(currentInput)
-      const dataResponse = await callDataAPI(apiResponse.api_url)
+      const apiResponse = await callPromptAPI(currentInput);
+      const dataResponse = await callDataAPI(apiResponse.api_url);
 
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: "assistant",
-        content: `I found ${dataResponse.data?.length || 0} great results for "${currentInput}". Here's what I discovered:`,
+        content: `I found ${
+          dataResponse.data?.length || 0
+        } great results for "${currentInput}". Here's what I discovered:`,
         timestamp: new Date(),
-      }
+      };
 
       const resultsMessage: ChatMessage = {
         id: (Date.now() + 2).toString(),
@@ -193,42 +203,62 @@ export default function GreensboroAIChat() {
         content: "",
         timestamp: new Date(),
         data: dataResponse.data || [],
-      }
+      };
 
-      setMessages((prev) => [...prev, assistantMessage, resultsMessage])
-      scrollToResults()
+      setMessages((prev) => [...prev, assistantMessage, resultsMessage]);
+      scrollToResults();
     } catch (error) {
-      console.error("API Error:", error)
+      console.error("API Error:", error);
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         type: "assistant",
-        content: "I encountered an error while searching. Please try again or check your connection.",
+        content:
+          "I encountered an error while searching. Please try again or check your connection.",
         timestamp: new Date(),
-      }
-      setMessages((prev) => [...prev, errorMessage])
+      };
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
-    })
-  }
+    });
+  };
 
   const quickActions = [
-    { icon: Calendar, text: "Events this weekend", query: "Show me events happening this weekend" },
-    { icon: MapPin, text: "Downtown attractions", query: "What attractions are in downtown Greensboro?" },
-    { icon: Star, text: "Free activities", query: "Find free things to do today" },
-    { icon: Clock, text: "Historic sites", query: "Show me historic sites and museums" },
-  ]
+    {
+      icon: Calendar,
+      text: "Events this weekend",
+      query: "Show me events happening this weekend",
+    },
+    {
+      icon: MapPin,
+      text: "Downtown attractions",
+      query: "What attractions are in downtown Greensboro?",
+    },
+    {
+      icon: Star,
+      text: "Free activities",
+      query: "Find free things to do today",
+    },
+    {
+      icon: Clock,
+      text: "Historic sites",
+      query: "Show me historic sites and museums",
+    },
+  ];
 
   if (showWelcome) {
     return (
-      <div className="min-h-screen relative overflow-hidden" style={{ paddingTop: "80px" }}>
+      <div
+        className="min-h-screen relative overflow-hidden"
+        style={{ paddingTop: "80px" }}
+      >
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
@@ -242,17 +272,29 @@ export default function GreensboroAIChat() {
           <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-emerald-500/10 to-emerald-600/10 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-gradient-to-l from-emerald-500/10 to-emerald-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
-          <FloatingElement className="top-1/4 left-1/4" delay={0} duration={8000}>
+          <FloatingElement
+            className="top-1/4 left-1/4"
+            delay={0}
+            duration={8000}
+          >
             <div className="p-3 glass-card rounded-2xl">
               <Cpu className="w-6 h-6 text-white/60" />
             </div>
           </FloatingElement>
-          <FloatingElement className="top-1/3 right-1/4" delay={3000} duration={9000}>
+          <FloatingElement
+            className="top-1/3 right-1/4"
+            delay={3000}
+            duration={9000}
+          >
             <div className="p-3 glass-card rounded-2xl">
               <Bot className="w-7 h-7 text-white/60" />
             </div>
           </FloatingElement>
-          <FloatingElement className="bottom-1/3 left-1/3" delay={6000} duration={7000}>
+          <FloatingElement
+            className="bottom-1/3 left-1/3"
+            delay={6000}
+            duration={7000}
+          >
             <div className="p-3 glass-card rounded-2xl">
               <Sparkles className="w-6 h-6 text-white/60" />
             </div>
@@ -277,7 +319,8 @@ export default function GreensboroAIChat() {
 
           <div className="max-w-3xl mb-12 animate-slide-up">
             <p className="text-xl text-white leading-relaxed mb-6 font-medium font-[family-name:var(--font-open-sans)] drop-shadow-lg">
-              Discover the best of the Gate City with personalized recommendations for
+              Discover the best of the Gate City with personalized
+              recommendations for
               <span className="bg-gradient-to-r from-emerald-300 via-emerald-400 to-emerald-500 bg-clip-text text-transparent font-semibold">
                 {" "}
                 events, dining, attractions, and experiences
@@ -320,7 +363,7 @@ export default function GreensboroAIChat() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -367,18 +410,18 @@ export default function GreensboroAIChat() {
         </div>
       </div>
 
-  <div
-  className="flex flex-col"
-  style={{
-    marginTop: "180px",
-    height: "calc(100vh - 180px)",
-    paddingTop: "100px",
-  }}
->
-
+      <div
+        className="flex flex-col"
+        style={{
+          marginTop: "180px",
+          height: "calc(100vh - 180px)",
+        }}
+      >
         <div className="flex-1 overflow-y-auto pt-20 px-6 pb-40 relative z-10 ">
-          <div className="max-w-6xl mx-auto space-y-8
-           border">
+          <div
+            className="max-w-6xl mx-auto space-y-8 py-6
+           "
+          >
             {messages.map((message) => (
               <div key={message.id} className="animate-slide-up">
                 {message.type === "user" ? (
@@ -419,8 +462,8 @@ export default function GreensboroAIChat() {
                                 alt={item.title}
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 bg-gray-200"
                               />
-                              <div className="absolute bottom-0 left-0">
-                                <Badge className="bg-emerald-500/90 text-emerald-foreground hover:bg-emerald-600 font-medium px-3 py-1 rounded-tr-full rounded-br-full">
+                              <div className="absolute bottom-0 left-2 mb-2 mr-2">
+                                <Badge className=" bg-emerald-500/90 text-emerald-foreground hover:bg-emerald-600 font-medium px-3 py-1 rounded-tl-full rounded-bl-full text-white">
                                   {item.categories}
                                 </Badge>
                               </div>
@@ -459,38 +502,47 @@ export default function GreensboroAIChat() {
                                     <DollarSign className="w-4 h-4 text-emerald-600" />
                                   </div>
                                   <span className="font-semibold text-emerald-600 text-sm font-[family-name:var(--font-open-sans)]">
-                                    {item.price === "0" || item.price === "free" ? "Free" : item.price}
+                                    {item.price === "0" || item.price === "free"
+                                      ? "Free"
+                                      : item.price}
                                   </span>
                                 </div>
                               </div>
 
                               <div className="flex flex-wrap gap-2 mb-4">
-                                {item.eventItemCategories?.slice(0, 2).map((cat, idx) => (
-                                  <Badge
-                                    key={idx}
-                                    variant="outline"
-                                    className="border-emerald-400/20 text-emerald-600 bg-emerald-500/5 rounded-full px-4 py-2 text-base"
-                                  >
-                                    {cat.category_name}
-                                  </Badge>
-                                ))}
-                                {item.attractionTypes?.slice(0, 2).map((type, idx) => (
-                                  <Badge
-                                    key={idx}
-                                    variant="outline"
-                                    className="border-emerald-400/20 text-emerald-600 bg-emerald-500/5 rounded-full px-4 py-2 text-base"
-                                  >
-                                    {type.attraction_type}
-                                  </Badge>
-                                ))}
+                                {item.eventItemCategories
+                                  ?.slice(0, 2)
+                                  .map((cat, idx) => (
+                                    <Badge
+                                      key={idx}
+                                      variant="outline"
+                                      className="border-emerald-400/20 text-emerald-600 bg-emerald-500/5 rounded-full px-4 py-2 text-base"
+                                    >
+                                      {cat.category_name}
+                                    </Badge>
+                                  ))}
+                                {item.attractionTypes
+                                  ?.slice(0, 2)
+                                  .map((type, idx) => (
+                                    <Badge
+                                      key={idx}
+                                      variant="outline"
+                                      className="border-emerald-400/20 text-emerald-600 bg-emerald-500/5 rounded-full px-4 py-2 text-base"
+                                    >
+                                      {type.attraction_type}
+                                    </Badge>
+                                  ))}
                               </div>
 
                               <Button
                                 onClick={() => setSelectedItem(item)}
                                 className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-emerald-foreground font-medium py-2 rounded-xl transition-all duration-300 hover-lift font-[family-name:var(--font-open-sans)]"
                               >
-                                <ExternalLink className="w-4 h-4 mr-2" />
-                                View Details
+                                <ExternalLink
+                                  className="w-4 h-4 mr-2"
+                                  color="white"
+                                />
+                                <span className="text-white">View Details</span>
                               </Button>
                             </CardContent>
                           </Card>
@@ -554,7 +606,10 @@ export default function GreensboroAIChat() {
 
       <div className="fixed bottom-0 left-0 right-0 glass-effect border-t border-border z-50">
         <div className="px-6 py-4">
-          <form onSubmit={handleSubmit} className="flex gap-3 max-w-4xl mx-auto">
+          <form
+            onSubmit={handleSubmit}
+            className="flex gap-3 max-w-4xl mx-auto"
+          >
             <div className="flex-1 relative">
               <Input
                 value={input}
@@ -572,7 +627,11 @@ export default function GreensboroAIChat() {
               disabled={!input.trim() || isLoading}
               className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white w-12 h-12 rounded-xl transition-all duration-300 hover-lift shadow-lg border-0"
             >
-              <Send className={`w-4 h-4 text-white ${isLoading ? "animate-pulse" : ""}`} />
+              <Send
+                className={`w-4 h-4 text-white ${
+                  isLoading ? "animate-pulse" : ""
+                }`}
+              />
             </Button>
           </form>
         </div>
@@ -583,7 +642,9 @@ export default function GreensboroAIChat() {
           {selectedItem && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-3xl font-bold text-foreground pr-10">{selectedItem.title}</DialogTitle>
+                <DialogTitle className="text-3xl font-bold text-foreground pr-10">
+                  {selectedItem.title}
+                </DialogTitle>
               </DialogHeader>
 
               <div className="space-y-8">
@@ -596,7 +657,9 @@ export default function GreensboroAIChat() {
                 </div>
 
                 {selectedItem.description && (
-                  <p className="text-muted-foreground leading-relaxed text-lg">{selectedItem.description}</p>
+                  <p className="text-muted-foreground leading-relaxed text-lg">
+                    {selectedItem.description}
+                  </p>
                 )}
 
                 <div className="grid gap-6">
@@ -647,7 +710,8 @@ export default function GreensboroAIChat() {
                       <span className="font-semibold text-lg">
                         {formatDate(selectedItem.event_starts)}
                         {selectedItem.event_ends &&
-                          selectedItem.event_ends !== selectedItem.event_starts &&
+                          selectedItem.event_ends !==
+                            selectedItem.event_starts &&
                           ` - ${formatDate(selectedItem.event_ends)}`}
                       </span>
                     </div>
@@ -658,7 +722,9 @@ export default function GreensboroAIChat() {
                       <DollarSign className="w-6 h-6 text-emerald-600" />
                     </div>
                     <span className="font-bold text-emerald-600 text-xl">
-                      {selectedItem.price === "0" || item.price === "free" ? "Free" : selectedItem.price}
+                      {selectedItem.price === "0" || item.price === "free"
+                        ? "Free"
+                        : selectedItem.price}
                     </span>
                   </div>
                 </div>
@@ -689,5 +755,5 @@ export default function GreensboroAIChat() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
