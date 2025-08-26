@@ -103,20 +103,17 @@ export default function GreensboroAIChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
-    });
+ const scrollToBottom = () => {
+   messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
 
-    // Short delay to let scrollIntoView finish, then adjust by navbar height
-    setTimeout(() => {
-      const container = messagesEndRef.current?.parentElement;
-      if (container) {
-        container.scrollTop = container.scrollTop - 80; // adjust 80 to match your navbar height
-      }
-    }, 350);
-  };
+   // Short delay to let scrollIntoView finish, then adjust by navbar height
+   setTimeout(() => {
+     const container = messagesEndRef.current?.parentElement;
+     if (container) {
+       container.scrollTop = container.scrollTop - 80; // adjust 80 to match your navbar height
+     }
+   }, 350);
+ };
 
   const scrollToResults = () => {
     setTimeout(() => {
@@ -428,11 +425,8 @@ export default function GreensboroAIChat() {
           height: "calc(100vh - 180px)",
         }}
       >
-        <div className="flex-1 overflow-y-auto pt-20 px-6 pb-40 relative z-10 ">
-          <div
-            className="max-w-6xl mx-auto space-y-8 py-6
-           "
-          >
+        <div className="flex-1 overflow-y-auto pt-15 px-6 pb-40 relative z-10 border ">
+          <div className="max-w-6xl mx-auto space-y-8 py-6 mt-10 ">
             {messages.map((message) => (
               <div key={message.id} className="animate-slide-up">
                 {message.type === "user" ? (
